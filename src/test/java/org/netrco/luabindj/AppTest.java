@@ -1,4 +1,4 @@
-package com.idoer.luabindj;
+package org.netrco.luabindj;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
