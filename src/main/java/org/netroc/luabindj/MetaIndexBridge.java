@@ -1,28 +1,22 @@
-package com.idoer.luabindj;
+package org.netroc.luabindj;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
-import org.luaj.vm2.lib.VarArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
 
-public class MetaNewIndexBridge extends VarArgFunction {
+public class MetaIndexBridge extends TwoArgFunction {
 	private BindClassConfig mCfg;
 
-	public MetaNewIndexBridge(BindClassConfig cfg) {
+	public MetaIndexBridge(BindClassConfig cfg) {
 		mCfg = cfg;
 	}
-	
+
 	@Override
-	public Varargs invoke(Varargs value) {
-		LuaValue table = value.arg(1);
-		LuaValue key = value.arg(2);
-		LuaValue val = value.arg(3);
-		
+	public LuaValue call(LuaValue table, LuaValue key) {
 		if( !table.isuserdata()) {
-			table.rawset(key.toString(), val);
-			return val;
+			return table.rawget(key);
 		}
 		
 		Object mObj = table.touserdata();
@@ -35,8 +29,7 @@ public class MetaNewIndexBridge extends VarArgFunction {
 		
 		if( f == null && m == null) {
 			//非导出字段,返回null
-			table.rawset(key.toString(), val);
-			return val;
+			return LuaValue.NIL;
 		}
 		
 		//没找到,从obj取
@@ -44,35 +37,38 @@ public class MetaNewIndexBridge extends VarArgFunction {
 			try {
 				Class<?> cls = f.getType();
 				f.setAccessible(true);
-				if( cls.equals(Integer.class)) {
-					f.set(mObj, val.toint());
+				//非基础类型,直接按Object处理
+				Object obj = f.get(mObj);
+				if( obj == null) {
+					return LuaValue.NIL;
+				}
+				if(cls.equals(Integer.class)) {
+					return LuaValue.valueOf(((Integer)obj).intValue());
 				} else if( cls.equals(Long.class)) {
-					f.set(mObj, val.tolong());
+					return LuaValue.valueOf(((Long)obj).longValue());
 				} else if( cls.equals(String.class)) {
-					f.set(mObj, val.toString());
+					return LuaValue.valueOf(((String)obj));
 				} else if( cls.equals(Double.class)) {
-					f.set(mObj, val.todouble());
+					return LuaValue.valueOf(((Double)obj).doubleValue());
 				} else if( cls.equals(Float.class)) {
-					f.set(mObj, val.tofloat());
+					return LuaValue.valueOf(((Float)obj).floatValue());
 				} else if( cls.equals(Boolean.class)) {
-					f.set(mObj, val.toboolean());
+					return LuaValue.valueOf(((Boolean)obj).booleanValue());
 				} else if( cls.equals(Byte.class)) {
-					f.set(mObj, val.tobyte());
+					return LuaValue.valueOf(((Byte)obj).byteValue());
 				} else if( cls.equals(Short.class)) {
-					f.set(mObj, val.toshort());
+					return LuaValue.valueOf(((Short)obj).shortValue());
 				} else {
 					//非基础类型,直接按Object处理
-					f.set(mObj, val.touserdata());
+					return LuaBindJ.toLuaValue(obj);
 				}
-				
-				return value;
 			} catch (Exception e) {
 				return LuaValue.error("Call java method fail:" + e.getMessage());
 			}
 		}
 		
 		if( m != null) {
-			return LuaValue.error("Can not set a java method value.");
+			return mCfg.getFunctonBridge(m.getName());
 		}
 		
 		return LuaValue.NIL;

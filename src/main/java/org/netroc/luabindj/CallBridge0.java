@@ -1,4 +1,4 @@
-package com.idoer.luabindj;
+package org.netroc.luabindj;
 
 import java.lang.reflect.Method;
 

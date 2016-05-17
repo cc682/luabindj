@@ -1,9 +1,8 @@
-package com.idoer.luabindj.test;
+package org.netroc.luabindj.test;
 
 import org.luaj.vm2.LuaValue;
-
-import com.idoer.luabindj.LuaBindJ;
-import com.idoer.luabindj.LuaExport;
+import org.netroc.luabindj.LuaBindJ;
+import org.netroc.luabindj.LuaExport;
 
 public class MainClass {
 	static class TestClass{

@@ -1,4 +1,4 @@
-package com.idoer.luabindj;
+package org.netroc.luabindj;
 
 import org.luaj.vm2.LuaValue;
 
