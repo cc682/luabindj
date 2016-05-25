@@ -1,2 +1,2 @@
 # luabindj
-A lua bind based on luaj
+A lua binding based on luaj
