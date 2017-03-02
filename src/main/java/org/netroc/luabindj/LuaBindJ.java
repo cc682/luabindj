@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaInteger;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaUserdata;
@@ -17,6 +18,8 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.compiler.LuaC;
 import org.luaj.vm2.lib.Bit32Lib;
 import org.luaj.vm2.lib.CoroutineLib;
+import org.luaj.vm2.lib.DebugLib;
+import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.PackageLib;
 import org.luaj.vm2.lib.StringLib;
 import org.luaj.vm2.lib.TableLib;
@@ -101,6 +104,15 @@ public class LuaBindJ {
 		LuaC.install(mLuaState);
 		
 		initStaticMethods();
+		
+		//补一下_G.loadstring
+		mLuaState.set("loadstring", new OneArgFunction() {
+			
+			@Override
+			public LuaValue call(LuaValue arg0) {
+				return LuaBindJ.this.mLuaState.load(arg0.toString());
+			}
+		});
 	}
 	
 	/**
@@ -139,7 +151,6 @@ public class LuaBindJ {
 	 */
 	public void openLibs() {
 		mLuaState.load(new JseBaseLib());
-		//package不要了,避免安全问题
 		mLuaState.load(new PackageLib());
 		mLuaState.load(new Bit32Lib());
 		mLuaState.load(new TableLib());
@@ -147,6 +158,22 @@ public class LuaBindJ {
 		mLuaState.load(new JseMathLib());
 		mLuaState.load(new CoroutineLib());
 		mLuaState.load(new MyOsLib());
+		mLuaState.load(new DebugLib());
+
+		
+		//补一下table.getn
+		LuaValue val = mLuaState.get("table");
+		val.set("getn", new OneArgFunction() {
+			
+			@Override
+			public LuaValue call(LuaValue arg0) {
+				if ( !(arg0 instanceof LuaTable)) {
+					throw new LuaError("table expected for table.getn");
+				}
+				LuaTable table = (LuaTable)arg0;
+				return table.len();
+			}
+		});
 	}
 	
 	/**
@@ -264,18 +291,22 @@ public class LuaBindJ {
 	 * @return
 	 */
 	public Object call(String strName, Object ...args) {
-		if( args == null || args.length == 0) {
-			LuaValue pfn = mLuaState.get(strName);
-			return LuaValueHelper.toObject(pfn.call());
-		} else {
-			LuaValue arrArgs[] = new LuaValue[args.length];
-			for( int i = 0; i < args.length; i++) {
-				LuaValue val = LuaValueHelper.toLuaObj(args[i]);
-				arrArgs[i] = val;
+		try {
+			if( args == null || args.length == 0) {
+				LuaValue pfn = mLuaState.get(strName);
+				return LuaValueHelper.toObject(pfn.call());
+			} else {
+				LuaValue arrArgs[] = new LuaValue[args.length];
+				for( int i = 0; i < args.length; i++) {
+					LuaValue val = LuaValueHelper.toLuaObj(args[i]);
+					arrArgs[i] = val;
+				}
+				LuaValue pfn = mLuaState.get(strName);
+				Varargs rtn = pfn.invoke(arrArgs);
+				return LuaValueHelper.toObject(rtn.arg1());
 			}
-			LuaValue pfn = mLuaState.get(strName);
-			Varargs rtn = pfn.invoke(arrArgs);
-			return LuaValueHelper.toObject(rtn.arg1());
+		} catch (Exception e) {
+			return null;
 		}
 	}
 }

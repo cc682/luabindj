@@ -44,21 +44,21 @@ public class MetaNewIndexBridge extends VarArgFunction {
 			try {
 				Class<?> cls = f.getType();
 				f.setAccessible(true);
-				if( cls.equals(Integer.class)) {
+				if( cls.equals(Integer.class) || cls.equals(int.class)) {
 					f.set(mObj, val.toint());
-				} else if( cls.equals(Long.class)) {
+				} else if( cls.equals(Long.class) || cls.equals(long.class)) {
 					f.set(mObj, val.tolong());
 				} else if( cls.equals(String.class)) {
 					f.set(mObj, val.toString());
-				} else if( cls.equals(Double.class)) {
+				} else if( cls.equals(Double.class) || cls.equals(double.class)) {
 					f.set(mObj, val.todouble());
-				} else if( cls.equals(Float.class)) {
+				} else if( cls.equals(Float.class) || cls.equals(float.class)) {
 					f.set(mObj, val.tofloat());
-				} else if( cls.equals(Boolean.class)) {
+				} else if( cls.equals(Boolean.class) || cls.equals(boolean.class)) {
 					f.set(mObj, val.toboolean());
-				} else if( cls.equals(Byte.class)) {
+				} else if( cls.equals(Byte.class) || cls.equals(byte.class)) {
 					f.set(mObj, val.tobyte());
-				} else if( cls.equals(Short.class)) {
+				} else if( cls.equals(Short.class) || cls.equals(short.class)) {
 					f.set(mObj, val.toshort());
 				} else {
 					//非基础类型,直接按Object处理

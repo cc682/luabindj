@@ -64,7 +64,11 @@ public class MainClass {
 		lua.runScript("oo={aa=1,bb=2}");
 		
 		lua.runScript("function pp( p1, p2) \n print(p1..p2) \n return p1..p2\n end");
-		lua.call("pp", "13213", "aadsada");
+		try {
+			lua.call("pp", "13213", "aadsada");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		lua.runScript("print(obj:add(3))");
 		
 		//lua.runScript("obj.child = obj:create() \n print (obj.child.n..0.3)");

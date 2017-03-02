@@ -73,9 +73,9 @@ public class MyOsLib extends TwoArgFunction {
 //	private static final int GETENV    = 5;
 //	private static final int REMOVE    = 6;
 //	private static final int RENAME    = 7;
-	private static final int SETLOCALE = 8;
-	private static final int TIME      = 9;
-	private static final int TMPNAME   = 10;
+	private static final int SETLOCALE = 3;
+	private static final int TIME      = 4;
+	private static final int TMPNAME   = 5;
 
 	private static final String[] NAMES = {
 		"clock",
@@ -484,7 +484,7 @@ public class MyOsLib extends TwoArgFunction {
 			c.set(Calendar.MILLISECOND, 0);
 			d = c.getTime();
 		}
-		return d.getTime() / 1000.;
+		return d.getTime() / 1000;
 	}
 
 	/**

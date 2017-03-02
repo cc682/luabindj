@@ -46,7 +46,6 @@ public class CallBridge extends VarArgFunction {
 			}
 			return LuaValueHelper.toLuaObj(rtn);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return LuaValue.error("Call java method fail:" + mMethod.getName() + ".msg:" + e.toString());
 		}
 	}

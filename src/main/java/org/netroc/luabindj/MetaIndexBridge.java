@@ -42,21 +42,21 @@ public class MetaIndexBridge extends TwoArgFunction {
 				if( obj == null) {
 					return LuaValue.NIL;
 				}
-				if(cls.equals(Integer.class)) {
+				if(cls.equals(Integer.class) || cls.equals(int.class)) {
 					return LuaValue.valueOf(((Integer)obj).intValue());
-				} else if( cls.equals(Long.class)) {
+				} else if( cls.equals(Long.class) || cls.equals(long.class)) {
 					return LuaValue.valueOf(((Long)obj).longValue());
 				} else if( cls.equals(String.class)) {
 					return LuaValue.valueOf(((String)obj));
-				} else if( cls.equals(Double.class)) {
+				} else if( cls.equals(Double.class) || cls.equals(double.class)) {
 					return LuaValue.valueOf(((Double)obj).doubleValue());
-				} else if( cls.equals(Float.class)) {
+				} else if( cls.equals(Float.class) || cls.equals(float.class)) {
 					return LuaValue.valueOf(((Float)obj).floatValue());
-				} else if( cls.equals(Boolean.class)) {
+				} else if( cls.equals(Boolean.class) || cls.equals(boolean.class)) {
 					return LuaValue.valueOf(((Boolean)obj).booleanValue());
-				} else if( cls.equals(Byte.class)) {
+				} else if( cls.equals(Byte.class) || cls.equals(byte.class)) {
 					return LuaValue.valueOf(((Byte)obj).byteValue());
-				} else if( cls.equals(Short.class)) {
+				} else if( cls.equals(Short.class) || cls.equals(short.class)) {
 					return LuaValue.valueOf(((Short)obj).shortValue());
 				} else {
 					//非基础类型,直接按Object处理

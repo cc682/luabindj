@@ -31,7 +31,7 @@ public class LuaValueHelper {
 		} else if( val.isuserdata()) {
 			return val.touserdata();
 		} else {
-			return val.touserdata();
+			return val;
 		}
 	}
 	
@@ -61,6 +61,8 @@ public class LuaValueHelper {
 			return val.tobyte();
 		} else if(cls.equals(String.class)) {
 			return val.toString();
+		} else if(cls.isInstance(val)) {
+			return val;
 		} else {
 			return val.touserdata();
 		}
@@ -98,6 +100,8 @@ public class LuaValueHelper {
 			return LuaValue.valueOf((Byte)(obj));
 		} else if( cls.equals(Short.class) || cls.equals(short.class)) {
 			return LuaValue.valueOf((Short)(obj));
+		} else if( cls.isAssignableFrom(LuaValue.class)) {
+			return (LuaValue)obj;
 		} else {
 			return LuaBindJ.toLuaValue(obj);
 		}
