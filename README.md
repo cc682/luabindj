@@ -4,70 +4,91 @@ luabindj is a simple,easy to use lua binding in java.
 
 # Quick sample: #
 
-    package org.netroc.luabindj;
-    
-    import org.netroc.luabindj.LuaBindJ;
-    import org.netroc.luabindj.LuaExport;
-    
-    import junit.framework.Test;
-    import junit.framework.TestCase;
-    import junit.framework.TestSuite;
-    
-    public class AppTest 
-    extends TestCase
-    {
-    	static {
-    		LuaBindJ.registerClass(AppTest.class, "AppTest");
-    	}
-    	
-    	//Vars export to lua
-    	@LuaExport
-    	private int nVar1 = 10;
-    	
-    	@LuaExport
-    	private int nVar2 = 20;
-    	
-    	@LuaExport
-    	private int Var1PlusVar2() {
-    		return nVar1 + nVar2;
-    	}
-    	
-    	public AppTest( String testName )
-    	{
-    		super( testName );
-    	}
-    	
-    	
-    	public static Test suite()
-    	{
-    		return new TestSuite( AppTest.class );
-    	}
-    	
-    	public void testApp()
-    	{
-    		LuaBindJ lua = new LuaBindJ();
-    		lua.open();
-    		lua.openLibs();
-    		lua.addGlobal("Test", this);
-    		
-    		String strScript = 
-    			"function luaFunction(a,b)\n" +
-    			"print('call luaFunction:', a, b)" +
-    			"return a*b\n" +
-    			"end\n" +
-    			"local sum = Test.nVar1 + Test.nVar2\n" +
-    			"print('sum=' .. sum)\n" +
-    			"local sum2 = Test:Var1PlusVar2()\n" +
-    			"print('sum2=' .. sum2)\n" +
-    			"return sum == sum2";
-    	
-	    	boolean blResult = lua.runScript(strScript).toboolean();
-	    	int data = (Integer)lua.call("luaFunction", 14, 20);
-	    	
-	        assertTrue( blResult );
-	        assertEquals(data, 14 * 20);
-    	}
-    }
+    package org.netroc.luabindj.test;
+
+		import org.luaj.vm2.LuaValue;
+		import org.netroc.luabindj.LuaBindJ;
+		import org.netroc.luabindj.LuaExport;
+		
+		public class MainClass {
+			static class TestClass{
+				@LuaExport
+				public Integer n = 100;
+				
+				@LuaExport
+				public int nn = 200;
+		
+				@LuaExport
+				public Float ff = 300.20f;
+		
+				@LuaExport
+				public TestClass child;
+		
+				public int add(int data) {
+					return n + data;
+				}
+		
+				@LuaExport
+				public double lParam( int a, float b, double c, Integer d, int e) {
+					return a+b+c+d+e;
+				}
+		
+				@LuaExport
+				public TestClass create() {
+					return new TestClass();
+				}
+				
+				@LuaExport
+				public static String staticFunc() {
+					return "staticFunc111";
+				}
+		
+				@LuaExport
+				public TestClass[] getArray() {
+					TestClass[] arr = new TestClass[3];
+					arr[0] = new TestClass();
+					arr[0].n = 11111;
+					arr[1] = new TestClass();
+					arr[2] = new TestClass();
+					return arr;
+				}
+			}
+			
+			public static void main(String[] args) {
+				LuaBindJ lua = new LuaBindJ();
+				
+				LuaBindJ.registerClass(TestClass.class, "TestClass", true);
+				
+				lua.open();
+				lua.openLibs();
+				
+				TestClass t = new TestClass();
+				LuaValue val = LuaBindJ.toLuaValue(t);
+				
+				lua.addGlobal("obj", val);
+				
+				lua.runScript("oo={aa=1,bb=2}");
+				
+				lua.runScript("function pp( p1, p2) \n print(p1..p2) \n return p1..p2\n end");
+				try {
+					lua.call("pp", "13213", "aadsada");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				lua.runScript("print(obj:add(3))");
+				
+				//lua.runScript("obj.child = obj:create() \n print (obj.child.n..0.3)");
+				//lua.runScript("print(obj.child.nn)");
+				
+				//lua.runScript("print(TestClass.staticFunc())");
+				
+				//lua.runScript("print(obj.child:getArray()[1].n, obj.child:getArray()[2].n, obj.child:getArray()[3].n)");
+				
+				System.out.print(t.n);
+				
+				lua.addGlobal("obj", LuaValue.NIL);
+		}
+	}
 
 
 License
